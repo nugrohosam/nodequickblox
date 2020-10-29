@@ -21,6 +21,10 @@ class User extends Model {
     })
   }
 
+  userRooms() {
+    return this.hasMany(UserRoom, 'id', 'user_id')
+  }
+
   /**
    * A relationship on tokens is required for auth to
    * work. Since features like `refreshTokens` or

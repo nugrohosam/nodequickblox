@@ -39,9 +39,9 @@ class HttpClientRequestService {
       return response.data;
     } catch (err) {
       if (err.response) {
-        return response.data
+        return err.response.data
       }
-      
+
       return null
     }
   }

@@ -6,18 +6,7 @@ const HttpClientRequestService = use('App/Services/HttpClientRequestService')
 const CryptoJS = use('crypto-js')
 const moment = use('moment')
 const Antl = use('Antl')
-
-const dataSession = {
-  application_id: null,
-  created_at: null,
-  id: null,
-  nonce: null,
-  token: null,
-  ts: null,
-  updated_at: null,
-  user_id: null,
-  _id: null
-}
+const MessageException = use('App/Exceptions/MessageException')
 
 class QuickBlox {
 
@@ -38,7 +27,7 @@ class QuickBlox {
   }
 
   createSignatureApp() {
-    let keyword = `application_id=${this.appId}&auth_key=${this.authKey}&nonce=${this.nonce}&timestamp=${this.timeStamp}`
+    let keyword = `application_id=${this.appId}&auth_key=adafs${this.authKey}&nonce=${this.nonce}&timestamp=${this.timeStamp}`
     return this.cryptSha1(keyword)
   }
 
@@ -57,27 +46,27 @@ class QuickBlox {
   }
 
   async createRoom() {
-    let createSessionBody = {
-      application_id: this.appId,
-      auth_key: this.authKey,
-      timestamp: this.timeStamp,
-      nonce: this.nonce,
-      signature: this.createSignatureApp()
-    }
-
-    let endpoint = `${Config.get('quickblox.apiUrl')}/session.json`
-    let httpClientService = new HttpClientRequestService(
+    const endpoint = `${Config.get('quickblox.apiUrl')}/session.json`
+    const httpClientService = new HttpClientRequestService(
       HttpClientRequestService.POST,
       endpoint,
-      createSessionBody
+      {
+        application_id: this.appId,
+        auth_key: this.authKey,
+        timestamp: this.timeStamp,
+        nonce: this.nonce,
+        signature: this.createSignatureApp()
+      }
     )
 
-    let data = await httpClientService.fetch()
-    if (!data.errors) {
-      return dataSession = data.session
+    const data = await httpClientService.fetch()
+    if (data.errors) {
+      return data
+    } else if (data && !data.errors && data.session) {
+      return data.session
     }
 
-    throw Antl.formatMessage('messages.greeting')
+    throw new MessageException(Antl.formatMessage('errors.server.error'))
   }
 }
 

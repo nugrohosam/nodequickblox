@@ -3,9 +3,7 @@
 /** @type {import('@adonisjs/lucid/src/Schema')} */
 const Schema = use('Schema')
 
-const {
-  Constant
-} = use('App/Models/Room')
+const Room = use('App/Models/Room')
 
 class RoomsSchema extends Schema {
   up() {
@@ -13,8 +11,8 @@ class RoomsSchema extends Schema {
       table.bigIncrements()
       table.string('session_id_quickblox').nullable()
       table.string('token_quickblox').nullable()
-      table.enu('context', Constant.CONTEXT).notNullable().defaultTo(Constant.CONTEXT[0])
-      table.enu('type', Constant.TYPE).notNullable().defaultTo(Constant.TYPE[0])
+      table.enu('context', Room.CONTEXTS).notNullable().defaultTo(Room.CONTEXTS[0])
+      table.enu('type', Room.TYPES).notNullable().defaultTo(Room.TYPES[0])
       table.datetime('expired_at').nullable()
       table.timestamps()
     })

@@ -175,6 +175,8 @@ module.exports = {
     */
     locale: 'en'
   },
+  
+  version: Env.get('VERSION', 1),
 
   logger: {
     /*

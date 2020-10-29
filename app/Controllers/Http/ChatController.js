@@ -3,18 +3,18 @@
 const ChatUsecase = use('App/Usecases/ChatUsecase')
 
 class ChatController {
-  
+
   chatUsecase = null
 
   constructor() {
     this.chatUsecase = new ChatUsecase()
   }
-  
-  storeRoom({
+
+  async storeRoom({
     request,
     response
   }) {
-    this.chatUsecase.createChatRoom()
+    await this.chatUsecase.createChatRoom()
     response.send('wokey')
   }
 }
