@@ -17,5 +17,5 @@
 const Route = use('Route')
 
 Route.group(() => {
-  Route.post('/chat', 'ChatController.storeRoom').as('chat.create.room')
+  Route.post('/register', 'AuthController.registerUser').as('chat.register.user')
 }).prefix('api/v1')

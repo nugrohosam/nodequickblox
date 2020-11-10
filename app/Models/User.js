@@ -7,6 +7,11 @@ const Model = use('Model')
 const Hash = use('Hash')
 
 class User extends Model {
+
+  static ROLE_CLIENT = 'client' 
+  static ROLE_INSIDER = 'insider' 
+  static ROLE_PARTNER = 'partner' 
+
   static boot () {
     super.boot()
 
@@ -19,10 +24,6 @@ class User extends Model {
         userInstance.password = await Hash.make(userInstance.password)
       }
     })
-  }
-
-  userRooms() {
-    return this.hasMany(UserRoom, 'id', 'user_id')
   }
 
   /**

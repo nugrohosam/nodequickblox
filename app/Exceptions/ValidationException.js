@@ -3,10 +3,9 @@
 const {
   LogicalException
 } = require('@adonisjs/generic-exceptions')
-const MessageException = require('App/Exceptions/MessageException')
 
 const code = 'VALIDATION_EXCEPTIOn'
-const Helper = use('App/Helpers/Base')
+const { restErrorValidation } = use('App/Helpers/Base')
 
 class ValidationException extends LogicalException {
 
@@ -21,7 +20,7 @@ class ValidationException extends LogicalException {
         ]
       })
 
-      super(Helper.restErrorValidation(new Map(mapValidation)), 400, code)
+      super(restErrorValidation(new Map(mapValidation)), 400, code)
     }
 
   }
