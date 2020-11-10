@@ -16,4 +16,8 @@ module.exports = {
   apiUrl: Env.get('QUICKBLOX_API_URL', null),
 
   secret: Env.get('QUICKBLOX_AUTH_SECRET', null),
+
+  login: Env.get('QUICKBLOX_LOGIN', null),
+
+  password: Env.get('QUICKBLOX_PASSWORD', null),
 }

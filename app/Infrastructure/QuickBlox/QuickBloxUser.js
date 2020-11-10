@@ -2,6 +2,7 @@
 
 const Config = use('Config')
 const HttpClientRequestService = use('App/Services/HttpClientRequestService')
+const UserDetailResponse = use('App/Infrastructure/QuickBlox/User/UserDetailResponse')
 const UserCreateResponse = use('App/Infrastructure/QuickBlox/User/UserCreateResponse')
 const UserGetResponse = use('App/Infrastructure/QuickBlox/User/UserGetResponse')
 const ValidationException = use('App/Exceptions/ValidationException')
@@ -10,8 +11,8 @@ const QuickBlox = use('App/Infrastructure/QuickBlox/QuickBlox')
 
 class QuickBloxUser extends QuickBlox {
 
-  async listUserByRole(role) {
-    let session = await this.getCachedSession()
+  async listUserByTags(tags) {
+    const session = await this.getCachedSession()
 
     const endpoint = `${Config.get('quickblox.apiUrl')}/users/by_tags.json`
     const httpClientService = new HttpClientRequestService(
@@ -22,7 +23,7 @@ class QuickBloxUser extends QuickBlox {
         'QB-Token': session.token
       },
       {
-        tags: role
+        tags: tags
       }
     )
 
@@ -38,8 +39,33 @@ class QuickBloxUser extends QuickBlox {
     throw (new ServerErrorException('fetch create user'))
   }
 
+  async findUserByExternalId(id) {
+    const session = await this.getCachedSession()
+
+    const endpoint = `${Config.get('quickblox.apiUrl')}/users/external/${id}.json`
+    const httpClientService = new HttpClientRequestService(
+      HttpClientRequestService.GET,
+      endpoint,
+      null,
+      {
+        'QB-Token': session.token
+      }
+    )
+
+    const data = await httpClientService.fetch()
+    if (data.errors) {
+      throw (new ValidationException(data.errors, 400))
+    } else if (data.code || data.message) {
+      throw (new ServerErrorException(data))
+    } else if (data) {
+      return (new UserDetailResponse(data.user))
+    }
+
+    throw (new ServerErrorException('fetch create user'))
+  }
+
   async create(userCreate) {
-    let session = await this.getCachedSession()
+    const session = await this.getCachedSession()
 
     const endpoint = `${Config.get('quickblox.apiUrl')}/users.json`
     const httpClientService = new HttpClientRequestService(

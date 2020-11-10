@@ -1,5 +1,7 @@
 'use strict'
 
+const { min } = require("moment")
+
 const uuid = use('uuid')
 const Config = use('Config')
 const HttpClientRequestService = use('App/Services/HttpClientRequestService')
@@ -17,6 +19,8 @@ class QuickBlox {
   nonce = null
   secret = null
   timeStamp = null
+  login = null
+  password = null
 
   constructor() {
     this.nonce = uuid.v4()
@@ -24,6 +28,8 @@ class QuickBlox {
     this.appId = Config.get('quickblox.appId')
     this.authKey = Config.get('quickblox.authKey')
     this.secret = Config.get('quickblox.secret')
+    this.login = Config.get('quickblox.login')
+    this.password = Config.get('quickblox.password')
   }
 
   async clearSession() {
@@ -35,13 +41,8 @@ class QuickBlox {
     return this.cryptSha1(keyword)
   }
 
-  createSignatureSocialMedia(token, provider) {
-    const keyword = `application_id=${this.appId}&auth_key=${this.authKey}&nonce=${this.nonce}&timestamp=${this.timeStamp}&keys[token]=${token}&provider=${provider}`
-    return this.cryptSha1(keyword)
-  }
-
-  createSignatureUser(username, password) {
-    const keyword = `application_id=${this.appId}&auth_key=${this.authKey}&nonce=${this.nonce}&timestamp=${this.timeStamp}&user[login]=${username}&user[password]=${password}`
+  createSignatureUser() {
+    const keyword = `application_id=${this.appId}&auth_key=${this.authKey}&nonce=${this.nonce}&timestamp=${this.timeStamp}&user[login]=${this.login}&user[password]=${this.password}`
     return this.cryptSha1(keyword)
   }
 
@@ -49,7 +50,36 @@ class QuickBlox {
     return CryptoJS.HmacSHA1(data, this.secret).toString()
   }
 
-  async init() {
+  async sessionUser() {
+    const endpoint = `${Config.get('quickblox.apiUrl')}/session.json`
+    const httpClientService = new HttpClientRequestService(
+      HttpClientRequestService.POST,
+      endpoint,
+      {
+        application_id: this.appId,
+        auth_key: this.authKey,
+        timestamp: this.timeStamp,
+        nonce: this.nonce,
+        signature: this.createSignatureUser(),
+        user: {
+          login: this.login,
+          password: this.password,
+        }
+      }
+    )
+
+    const data = await httpClientService.fetch()
+    if (data.errors) {
+      throw new ServerErrorException(data.errors)
+    } else if (data && !data.errors && data.session) {
+      await setCache(NAME_CACHED_SESSION, data.session)
+      return data.session
+    } else {
+      throw new MessageException(Antl.formatMessage('errors.server.error'))
+    }
+  }
+
+  async sessionApp() {
     const endpoint = `${Config.get('quickblox.apiUrl')}/session.json`
     const httpClientService = new HttpClientRequestService(
       HttpClientRequestService.POST,
@@ -77,7 +107,7 @@ class QuickBlox {
   async getCachedSession() {
     let session = await getCache(NAME_CACHED_SESSION)
     if (!session) {
-      session = await this.init()
+      session = await this.sessionUser()
     }
 
     return session
