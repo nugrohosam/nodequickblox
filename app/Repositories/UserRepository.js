@@ -16,6 +16,29 @@ class UserRepository {
     return this
   }
 
+  getId() {
+    return this.model.id
+  }
+
+  async updateById({
+    data, id
+  }) {
+    return await User.query().where('id', id).update(data, this.trx)
+  }
+
+  async updateUserQuickbloxId(userQuickBloxId) {
+    this.model.user_quickblox_id = userQuickBloxId
+    return await this.save()
+  }
+
+  async save(){
+    if (this.trx) {
+      return await this.model.save(this.trx)
+    } else {
+      return await this.model.save()
+    }
+  }
+
   async create({
     fullname,
     username,
@@ -29,11 +52,7 @@ class UserRepository {
     this.model.password = password
     this.model.role = role
 
-    if (this.trx) {
-      return await this.model.save(this.trx)
-    } else {
-      return await this.model.save()
-    }
+    return await this.save()
   }
 }
 

@@ -1,5 +1,4 @@
 {
-  "server": {
-    "error": "Server error"
-  }
+  "server_error": "Server error",
+  "cannot_create_user": "Cannot create user"
 }

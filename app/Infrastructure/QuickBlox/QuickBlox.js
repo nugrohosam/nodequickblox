@@ -75,7 +75,7 @@ class QuickBlox {
       await setCache(NAME_CACHED_SESSION, data.session)
       return data.session
     } else {
-      throw new MessageException(Antl.formatMessage('errors.server.error'))
+      throw new MessageException(Antl.formatMessage('errors.server_error'))
     }
   }
 
@@ -100,7 +100,7 @@ class QuickBlox {
       await setCache(NAME_CACHED_SESSION, data.session)
       return data.session
     } else {
-      throw new MessageException(Antl.formatMessage('errors.server.error'))
+      throw new MessageException(Antl.formatMessage('errors.server_error'))
     }
   }
 

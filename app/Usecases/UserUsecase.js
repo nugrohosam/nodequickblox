@@ -1,17 +1,17 @@
 'use strict'
 
 const UserCreateRequest = use("App/Infrastructure/QuickBlox/User/UserCreateRequest")
-
 const QuickBloxUser = use('App/Infrastructure/QuickBlox/QuickBloxUser')
 const UserRepository = use('App/Repositories/UserRepository')
 const Database = use('Database')
-const ServerErrorException = use('App/Exceptions/ServerErrorException')
 const User = use('App/Models/User')
+const UserCannotCreateException = use('App/Exceptions/UserCannotCreateException')
 
 class UserUsecase {
-  quickBloxInfra = null
-  createUserQuickBloxRequest = null
-  userRepo = null
+
+  quickBloxInfra
+  createUserQuickBloxRequest
+  userRepo
 
   constructor() {
     this.quickBloxInfra = new QuickBloxUser()
@@ -24,8 +24,9 @@ class UserUsecase {
 
     try {
       const role = User.ROLE_CLIENT
+      this.userRepo = this.userRepo.useTrans(trx)
 
-      const isSaved = await this.userRepo.useTrans(trx).create({
+      const isSaved = await this.userRepo.create({
         fullname,
         username,
         email,
@@ -33,29 +34,21 @@ class UserUsecase {
         role
       });
 
-
       if (isSaved) {
         const login = username
+        const userQuickBlox = await this.createUserQuickBlox({
+          login,
+          password,
+          email,
+          fullname,
+          role,
+          phone,
+          externalUserId: this.userRepo.getId()
+        })
 
-        switch (role) {
-          case User.ROLE_PARTNER:
-            await this.createUserQuickBloxPartner({
-              login, password, email, fullname, phone
-            })
-            break;
-          case User.ROLE_CLIENT:
-            await this.createUserQuickBloxClient({
-              login, password, email, fullname, phone
-            })
-            break;
-          case User.ROLE_INSIDER:
-            await this.createUserQuickBloxInsider({
-              login, password, email, fullname, phone
-            })
-            break;
-          default:
-            throw (new ServerErrorException('Role not correct'))
-        }
+        await this.userRepo.updateUserQuickbloxId(userQuickBlox.id)
+      } else {
+        throw new UserCannotCreateException()
       }
 
       trx.commit()
@@ -70,7 +63,9 @@ class UserUsecase {
     password,
     email,
     fullname,
-    phone
+    role,
+    phone,
+    externalUserId
   }) {
     this.createUserQuickBloxRequest.login = login
     this.createUserQuickBloxRequest.password = password
@@ -78,59 +73,10 @@ class UserUsecase {
     this.createUserQuickBloxRequest.login = login
     this.createUserQuickBloxRequest.full_name = fullname
     this.createUserQuickBloxRequest.phone = phone
+    this.createUserQuickBloxRequest.role = role
+    this.createUserQuickBloxRequest.external_user_id = externalUserId
 
-    await this.quickBloxInfra.create(this.createUserQuickBloxRequest)
-  }
-
-  async createUserQuickBloxPartner(
-    login,
-    password,
-    email,
-    fullname,
-    phone
-  ) {
-    this.createUserQuickBloxRequest.tag_list = User.ROLE_PARTNER
-    await this.createUserQuickBlox(
-      login,
-      password,
-      email,
-      fullname,
-      phone
-    )
-  }
-
-  async createUserQuickBloxClient(
-    login,
-    password,
-    email,
-    fullname,
-    phone
-  ) {
-    this.createUserQuickBloxRequest.tag_list = User.ROLE_CLIENT
-    await this.createUserQuickBlox(
-      login,
-      password,
-      email,
-      fullname,
-      phone
-    )
-  }
-
-  async createUserQuickBloxInsider(
-    login,
-    password,
-    email,
-    full_name,
-    phone
-  ) {
-    this.createUserQuickBloxRequest.tag_list = User.ROLE_INSIDER
-    await this.createUserQuickBlox(
-      login,
-      password,
-      email,
-      full_name,
-      phone
-    )
+    return await this.quickBloxInfra.create(this.createUserQuickBloxRequest)
   }
 }
 

@@ -1,6 +1,9 @@
 'use strict'
 
 const UserUsecase = use('App/Usecases/UserUsecase')
+const {
+  restApi
+} = use('App/Helpers/Base')
 
 class AuthController {
 
@@ -11,17 +14,11 @@ class AuthController {
     this.userUsecase = new UserUsecase()
   }
 
-  async registerUser({
-    request,
+  async profile({
+    auth,
     response
   }) {
-    await this.userUsecase.registerUser(
-      request.body.fullname,
-      request.body.username,
-      request.body.email,
-      request.body.password
-    )
-    response.send('User Created')
+    return response.status(200).json(restApi(auth.user))
   }
 }
 

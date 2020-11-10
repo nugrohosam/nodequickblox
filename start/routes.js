@@ -17,5 +17,12 @@
 const Route = use('Route')
 
 Route.group(() => {
-  Route.post('/register', 'AuthController.registerUser').as('chat.register.user')
+  Route.post('/register', 'V1/AuthController.registerUser').as('chat.register.user')
+  Route.post('/login', 'V1/AuthController.loginUser').as('chat.login.user')
 }).prefix('api/v1')
+
+Route.group(() => {
+    Route.post('/profile', 'V1/UserController.profile').as('chat.login.user')
+  })
+  .middleware(['auth'])
+  .prefix('api/v1')

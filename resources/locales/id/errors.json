@@ -1,5 +1,4 @@
 {
-  "server": {
-    "error": "Server error"
-  }
+  "server_error": "Server ada kendala",
+  "cannot_create_user": "Tidak bisa membuat user"
 }

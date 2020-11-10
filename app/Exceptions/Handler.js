@@ -26,7 +26,8 @@ class ExceptionHandler extends BaseExceptionHandler {
     if (error.status != 500) {
       return response.status(error.status).json(error.message)
     } else {
-      return response.status(error.status).json(Antl.formatMessage('errors.server.error'))
+      console.log(error)
+      return response.status(error.status).json(Antl.formatMessage('errors.server_error'))
     }
   }
 
