@@ -3,8 +3,10 @@
 const Config = use('Config')
 const HttpClientRequestService = use('App/Services/HttpClientRequestService')
 const Antl = use('Antl')
-const MessageException = use('App/Exceptions/MessageException')
 const UserCreateResponse = use('App/Infrastructure/QuickBlox/User/UserCreateResponse')
+const MessageException = use('App/Exceptions/MessageException')
+const ValidationException = use('App/Exceptions/ValidationException')
+const ServerErrorException = use('App/Exceptions/ServerErrorException')
 const QuickBlox = use('App/Infrastructure/QuickBlox/QuickBlox')
 
 class QuickBloxUser extends QuickBlox {
@@ -19,7 +21,7 @@ class QuickBloxUser extends QuickBlox {
     const httpClientService = new HttpClientRequestService(
       HttpClientRequestService.POST,
       endpoint,
-      userCreate.objects,
+      { user: userCreate.toObject() },
       {
         'Content-type': 'application/json',
         'QB-Token': session.token
@@ -28,14 +30,14 @@ class QuickBloxUser extends QuickBlox {
 
     const data = await httpClientService.fetch()
     if (data.errors) {
-      throw new ServerErrorException(data.errors)
-    } else if (data.code && data.message) {
-      throw new ServerErrorException(data)
+      throw (new ValidationException(data.errors, 500))
+    } else if (data.code || data.message) {
+      throw (new ServerErrorException(data))
     } else if (data) {
       return (new UserCreateResponse(data.user))
     }
 
-    throw (new MessageException(Antl.formatMessage('errors.server.error')))
+    throw (new ServerErrorException('fetch create user'))
   }
 }
 

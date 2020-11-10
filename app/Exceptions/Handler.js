@@ -2,7 +2,7 @@
 
 const BaseExceptionHandler = use('BaseExceptionHandler')
 const sentry = use('Sentry')
-const { restErrorMessage } = use('App/Helpers/Base')
+const Antl = use('Antl')
 
 /**
  * This class handles all exceptions thrown during
@@ -24,10 +24,9 @@ class ExceptionHandler extends BaseExceptionHandler {
    */
   async handle(error, { request, response }) {
     if (error.status != 500) {
-      return response.status(error.status).json(restErrorMessage(error.message))
+      return response.status(error.status).json(error.message)
     } else {
-      console.log(error)
-      return response.status(error.status).json(restErrorMessage('Server Error'))
+      return response.status(error.status).json(Antl.formatMessage('errors.server.error'))
     }
   }
 

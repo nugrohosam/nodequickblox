@@ -33,47 +33,49 @@ class UserUsecase {
         role
       });
 
-      trx.commit()
 
       if (isSaved) {
+        const login = username
+
         switch (role) {
           case User.ROLE_PARTNER:
-            this.createUserQuickBloxPartner({
-              username, password, email, fullname, phone
+            await this.createUserQuickBloxPartner({
+              login, password, email, fullname, phone
             })
             break;
           case User.ROLE_CLIENT:
-            this.createUserQuickBloxClient({
-              username, password, email, fullname, phone
+            await this.createUserQuickBloxClient({
+              login, password, email, fullname, phone
             })
             break;
           case User.ROLE_INSIDER:
-            this.createUserQuickBloxInsider({
-              username, password, email, fullname, phone
+            await this.createUserQuickBloxInsider({
+              login, password, email, fullname, phone
             })
             break;
           default:
-            throw (new Exception('Role not correct'))
+            throw (new ServerErrorException('Role not correct'))
         }
       }
 
+      trx.commit()
     } catch (e) {
-      console.log('do rollback')
-      trx.rollback()      
-      throw (new ServerErrorException(e))
+      trx.rollback()
+      throw e
     }
   }
 
-  async createUserQuickBlox(
+  async createUserQuickBlox({
     login,
     password,
     email,
     fullname,
     phone
-  ) {
+  }) {
     this.createUserQuickBloxRequest.login = login
     this.createUserQuickBloxRequest.password = password
     this.createUserQuickBloxRequest.email = email
+    this.createUserQuickBloxRequest.login = login
     this.createUserQuickBloxRequest.full_name = fullname
     this.createUserQuickBloxRequest.phone = phone
 

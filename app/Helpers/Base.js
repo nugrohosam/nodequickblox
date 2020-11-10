@@ -3,7 +3,7 @@
 const Config = use('Config')
 const Redis = use('Redis')
 
-module.exports = {
+const Base = {
 
   restApi: (data) => {
     return {
@@ -33,7 +33,7 @@ module.exports = {
    getCache:  async (name) =>  {
     const cached = await Redis.get(name)
     if (cached) {
-      return this.isJson(cached) ? JSON.parse(cached) : cached
+      return Base.isJson(cached) ? JSON.parse(cached) : cached
     }
   },
 
@@ -44,3 +44,5 @@ module.exports = {
     }
   }
 }
+
+module.exports = Base;

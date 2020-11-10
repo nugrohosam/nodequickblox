@@ -12,17 +12,19 @@ class UserCreateRequest {
     tag_list;
     custom_data;
 
-    objects = {
-        login: this.login,
-        password: this.password,
-        email: this.email,
-        external_user_id: this.external_user_id,
-        facebook_id: this.facebook_id,
-        full_name: this.full_name,
-        phone: this.phone,
-        website: this.website,
-        tag_list: this.tag_list,
-        custom_data: this.custom_data
+    toObject() {
+        return {
+            login: this.login || null,
+            password: this.password || null,
+            email: this.email || null,
+            external_user_id: this.external_user_id || null,
+            facebook_id: this.facebook_id || null,
+            full_name: this.full_name || null,
+            phone: this.phone || null,
+            website: this.website || null,
+            tag_list: this.tag_list || null,
+            custom_data: this.custom_data || null
+        }
     }
 
     toJson() {

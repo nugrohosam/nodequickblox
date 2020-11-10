@@ -7,7 +7,6 @@ const CryptoJS = use('crypto-js')
 const moment = use('moment')
 const Antl = use('Antl')
 const MessageException = use('App/Exceptions/MessageException')
-const ValidationException = use('App/Exceptions/ValidationException')
 const ServerErrorException = use('App/Exceptions/ServerErrorException')
 const { getCache, setCache } = use('App/Helpers/Base')
 const NAME_CACHED_SESSION = 'session'
@@ -28,7 +27,7 @@ class QuickBlox {
   }
 
   createSignatureApp() {
-    const keyword = `application_id=${this.appId}&auth_key=adafs${this.authKey}&nonce=${this.nonce}&timestamp=${this.timeStamp}`
+    const keyword = `application_id=${this.appId}&auth_key=${this.authKey}&nonce=${this.nonce}&timestamp=${this.timeStamp}`
     return this.cryptSha1(keyword)
   }
 
@@ -62,7 +61,7 @@ class QuickBlox {
 
     const data = await httpClientService.fetch()
     if (data.errors) {
-      throw new ValidationException(data.errors)
+      throw new ServerErrorException(data.errors)
     } else if (data && !data.errors && data.session) {
       setCache(NAME_CACHED_SESSION, data.session)
       return data.session

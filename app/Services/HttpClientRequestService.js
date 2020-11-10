@@ -16,7 +16,7 @@ class HttpClientRequestService {
   url = null
 
   constructor(method, url = '', body = {}, headers = {
-    "content-type": "application/json"
+    "Content-type": "application/json"
   }, params = {}) {
     this.method = method
     this.url = url
