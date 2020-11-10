@@ -8,7 +8,7 @@ const moment = use('moment')
 const Antl = use('Antl')
 const MessageException = use('App/Exceptions/MessageException')
 const ServerErrorException = use('App/Exceptions/ServerErrorException')
-const { getCache, setCache } = use('App/Helpers/Base')
+const { getCache, setCache, clearCache } = use('App/Helpers/Base')
 const NAME_CACHED_SESSION = 'session'
 
 class QuickBlox {
@@ -24,6 +24,10 @@ class QuickBlox {
     this.appId = Config.get('quickblox.appId')
     this.authKey = Config.get('quickblox.authKey')
     this.secret = Config.get('quickblox.secret')
+  }
+
+  async clearSession() {
+    return await clearCache(NAME_CACHED_SESSION)
   }
 
   createSignatureApp() {
@@ -63,7 +67,7 @@ class QuickBlox {
     if (data.errors) {
       throw new ServerErrorException(data.errors)
     } else if (data && !data.errors && data.session) {
-      setCache(NAME_CACHED_SESSION, data.session)
+      await setCache(NAME_CACHED_SESSION, data.session)
       return data.session
     } else {
       throw new MessageException(Antl.formatMessage('errors.server.error'))
@@ -71,7 +75,12 @@ class QuickBlox {
   }
 
   async getCachedSession() {
-    return await getCache(NAME_CACHED_SESSION)
+    let session = await getCache(NAME_CACHED_SESSION)
+    if (!session) {
+      session = await this.init()
+    }
+
+    return session
   }
 }
 

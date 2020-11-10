@@ -14,16 +14,18 @@ class UserCreateRequest {
 
     toObject() {
         return {
-            login: this.login || null,
-            password: this.password || null,
-            email: this.email || null,
-            external_user_id: this.external_user_id || null,
-            facebook_id: this.facebook_id || null,
-            full_name: this.full_name || null,
-            phone: this.phone || null,
-            website: this.website || null,
-            tag_list: this.tag_list || null,
-            custom_data: this.custom_data || null
+            user: {
+                login: this.login || null,
+                password: this.password || null,
+                email: this.email || null,
+                external_user_id: this.external_user_id || null,
+                facebook_id: this.facebook_id || null,
+                full_name: this.full_name || null,
+                phone: this.phone || null,
+                website: this.website || null,
+                tag_list: this.tag_list || null,
+                custom_data: this.custom_data || null
+            }
         }
     }
 

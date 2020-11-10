@@ -25,12 +25,16 @@ const Base = {
     }
   },
 
-   setCache: async (name, value) => {
+  setCache: async (name, value) => {
     const data = JSON.stringify(value)
     await Redis.set(name, data)
   },
 
-   getCache:  async (name) =>  {
+  clearCache: async (name) => {
+    await Redis.set(name, null)
+  },
+
+  getCache: async (name) => {
     const cached = await Redis.get(name)
     if (cached) {
       return Base.isJson(cached) ? JSON.parse(cached) : cached
