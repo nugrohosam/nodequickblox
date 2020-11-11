@@ -7,5 +7,4 @@ const User = use('App/Models/User')
 test('test list user', async ({ assert }) => {
   const quickBloxUser = new QuickBloxUser()
   await quickBloxUser.listUserByTags(User.ROLE_CLIENT)
-  assert.isTrue(true)
 })

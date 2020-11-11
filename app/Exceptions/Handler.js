@@ -3,6 +3,7 @@
 const BaseExceptionHandler = use('BaseExceptionHandler')
 const sentry = use('Sentry')
 const Antl = use('Antl')
+const Config = use('Config')
 
 /**
  * This class handles all exceptions thrown during
@@ -23,10 +24,11 @@ class ExceptionHandler extends BaseExceptionHandler {
    * @return {void}
    */
   async handle(error, { request, response }) {
-    if (error.status != 500) {
+    if (Config.get('app.env') == Config.get('app.env_testing')) {
+      return error
+    } else if (error.status != 500) {
       return response.status(error.status).json(error.message)
     } else {
-      console.log(error)
       return response.status(error.status).json(Antl.formatMessage('errors.server_error'))
     }
   }

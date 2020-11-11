@@ -29,6 +29,14 @@ module.exports = {
   */
   appKey: Env.getOrFail('APP_KEY'),
 
+  env: Env.getOrFail('NODE_ENV'),
+
+  env_testing: 'testing',
+  
+  env_development: 'development',
+
+  env_production: 'production',
+
   http: {
     /*
     |--------------------------------------------------------------------------

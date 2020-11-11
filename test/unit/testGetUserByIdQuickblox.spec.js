@@ -6,6 +6,5 @@ const User = use('App/Models/User')
 
 test('test list user', async ({ assert }) => {
   const quickBloxUser = new QuickBloxUser()
-  await quickBloxUser.findUserByExternalId(1)
-  assert.isTrue(true)
+  await quickBloxUser.findUserByExternalId(null)
 })

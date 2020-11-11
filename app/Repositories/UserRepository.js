@@ -20,6 +20,10 @@ class UserRepository {
     return this.model.id
   }
 
+  getUuid() {
+    return this.model.uuid
+  }
+
   async updateById({
     data, id
   }) {

@@ -7,11 +7,12 @@ const Config = use('Config')
 const HttpClientRequestService = use('App/Services/HttpClientRequestService')
 const CryptoJS = use('crypto-js')
 const moment = use('moment')
-const Antl = use('Antl')
-const MessageException = use('App/Exceptions/MessageException')
+const ValidationException = use('App/Exceptions/ValidationException')
 const ServerErrorException = use('App/Exceptions/ServerErrorException')
 const { getCache, setCache, clearCache } = use('App/Helpers/Base')
-const NAME_CACHED_SESSION = 'session'
+
+const NAME_CACHED_SESSION_QUICKBLOX_USER = 'session_quickblox_user'
+const NAME_CACHED_SESSION_QUICKBLOX_APP = 'session_quickblox_app'
 
 class QuickBlox {
   appId = null
@@ -32,8 +33,8 @@ class QuickBlox {
     this.password = Config.get('quickblox.password')
   }
 
-  async clearSession() {
-    return await clearCache(NAME_CACHED_SESSION)
+  async clearSession(name) {
+    return await clearCache(name)
   }
 
   createSignatureApp() {
@@ -70,13 +71,13 @@ class QuickBlox {
 
     const data = await httpClientService.fetch()
     if (data.errors) {
-      throw new ServerErrorException(data.errors)
+      throw new ValidationException(data.errors)
     } else if (data && !data.errors && data.session) {
-      await setCache(NAME_CACHED_SESSION, data.session)
+      await setCache(NAME_CACHED_SESSION_QUICKBLOX_USER, data.session)
       return data.session
-    } else {
-      throw new MessageException(Antl.formatMessage('errors.server_error'))
     }
+
+    throw new ServerErrorException('sessionUser()')
   }
 
   async sessionApp() {
@@ -95,19 +96,28 @@ class QuickBlox {
 
     const data = await httpClientService.fetch()
     if (data.errors) {
-      throw new ServerErrorException(data.errors)
+      throw new ValidationException(data.errors)
     } else if (data && !data.errors && data.session) {
-      await setCache(NAME_CACHED_SESSION, data.session)
+      await setCache(NAME_CACHED_SESSION_QUICKBLOX_APP, data.session)
       return data.session
-    } else {
-      throw new MessageException(Antl.formatMessage('errors.server_error'))
     }
+
+    throw new ServerErrorException('sessionApp()')
   }
 
-  async getCachedSession() {
-    let session = await getCache(NAME_CACHED_SESSION)
+  async getCachedSessionUser() {
+    let session = await getCache(NAME_CACHED_SESSION_QUICKBLOX_USER)
     if (!session) {
       session = await this.sessionUser()
+    }
+
+    return session
+  }
+
+  async getCachedSessionApp() {
+    let session = await getCache(NAME_CACHED_SESSION_QUICKBLOX_APP)
+    if (!session) {
+      session = await this.sessionApp()
     }
 
     return session

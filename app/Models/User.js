@@ -5,14 +5,15 @@ const Model = use('Model')
 
 /** @type {import('@adonisjs/framework/src/Hash')} */
 const Hash = use('Hash')
+const uuid = use('uuid')
 
 class User extends Model {
 
-  static ROLE_CLIENT = 'client' 
-  static ROLE_INSIDER = 'insider' 
-  static ROLE_PARTNER = 'partner' 
+  static ROLE_CLIENT = 'client'
+  static ROLE_INSIDER = 'insider'
+  static ROLE_PARTNER = 'partner'
 
-  static boot () {
+  static boot() {
     super.boot()
 
     /**
@@ -20,6 +21,7 @@ class User extends Model {
      * it to the database.
      */
     this.addHook('beforeSave', async (userInstance) => {
+      userInstance.uuid = uuid.v4()
       if (userInstance.dirty.password) {
         userInstance.password = await Hash.make(userInstance.password)
       }
@@ -36,7 +38,7 @@ class User extends Model {
    *
    * @return {Object}
    */
-  tokens () {
+  tokens() {
     return this.hasMany('App/Models/Token')
   }
 }

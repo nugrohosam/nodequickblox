@@ -12,7 +12,7 @@ const QuickBlox = use('App/Infrastructure/QuickBlox/QuickBlox')
 class QuickBloxUser extends QuickBlox {
 
   async listUserByTags(tags) {
-    const session = await this.getCachedSession()
+    const session = await this.getCachedSessionApp()
 
     const endpoint = `${Config.get('quickblox.apiUrl')}/users/by_tags.json`
     const httpClientService = new HttpClientRequestService(
@@ -40,7 +40,7 @@ class QuickBloxUser extends QuickBlox {
   }
 
   async findUserByExternalId(id) {
-    const session = await this.getCachedSession()
+    const session = await this.getCachedSessionApp()
 
     const endpoint = `${Config.get('quickblox.apiUrl')}/users/external/${id}.json`
     const httpClientService = new HttpClientRequestService(
@@ -65,7 +65,7 @@ class QuickBloxUser extends QuickBlox {
   }
 
   async create(userCreate) {
-    const session = await this.getCachedSession()
+    const session = await this.getCachedSessionApp()
 
     const endpoint = `${Config.get('quickblox.apiUrl')}/users.json`
     const httpClientService = new HttpClientRequestService(
@@ -80,7 +80,7 @@ class QuickBloxUser extends QuickBlox {
 
     const data = await httpClientService.fetch()
     if (data.errors) {
-      throw (new ValidationException(data.errors, 500))
+      throw (new ValidationException(data.errors))
     } else if (data.code || data.message) {
       throw (new ServerErrorException(data))
     } else if (data) {

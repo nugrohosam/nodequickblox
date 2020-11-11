@@ -19,7 +19,7 @@ class ValidationException extends LogicalException {
           'rules': validation[key]
         }
       })
-
+      
       super(restErrorValidation(mapValidation), 400)
     }
 
